@@ -2,6 +2,8 @@
 <?php
 
 require 'vendor/autoload.php';
+
+use Facebook\FacebookSession;
 use Facebook\FacebookRequest;
 use Facebook\GraphObject;
 use Facebook\FacebookRequestException;
