@@ -1,8 +1,20 @@
+#!/usr/local/bin/php
+<?php
+
+require 'vendor/autoload.php';
 use Facebook\FacebookRequest;
 use Facebook\GraphObject;
 use Facebook\FacebookRequestException;
 
+print "Starting up\n";
+
+
+
+FacebookSession::setDefaultApplication('48142871874', 'ab9db094319d13e702ae8a1df85a2eeb');
+
+
 if($session) {
+print "Have a Session\n";
 
   try {
 
@@ -29,3 +41,4 @@ if($session) {
   }   
 
 }
+?>
