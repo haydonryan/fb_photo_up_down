@@ -21,6 +21,9 @@ use Facebook\Entities\AccessToken;
 use Facebook\HttpClients\FacebookCurlHttpClient;
 use Facebook\HttpClients\FacebookHttpable;
 
+$FBPAGE_ID = '191589877477';  //Amnesia Photos page
+
+
 print "Starting up\n";
 
 
@@ -32,13 +35,13 @@ print "Setting App SECRET: $APP_SECRET\n";
 FacebookSession::setDefaultApplication($APP_ID, $APP_SECRET);
 
 print("Go To a browser and type in:\n");
-print("https://www.facebook.com/dialog/oauth?client_id=$APP_ID&redirect_uri=https%3A%2F%2Fwww.amnesiaphotos.com%2Fconnect%2Flogin_success.html&scope=manage_pages,user_status&response_type=token\n");
+print("https://www.facebook.com/dialog/oauth?client_id=$APP_ID&redirect_uri=https%3A%2F%2Fwww.amnesiaphotos.com%2Fconnect%2Flogin_success.html&scope=publish_stream,manage_pages,user_status&response_type=token\n");
 
 // If you're making app-level requests:
 $session = FacebookSession::newAppSession();
 
 // this has to come from the parameter sent to amnesia photos site
-$session = new FacebookSession('CAAAACzWJ7UIBAEw6JZB5vhOHarbpupZA5mZAwfUOLOnwNkZAKawZCYNzojBNv3VaeYXALSmT4h2WvnKrOXFKlR48uZCQiXV2ZCCoXLBgso5YHqR0PcthixMCLw8pUE6oDbehp0aXeIFWUDJ74UFDfGOlVGuHWXMvTPOA2q23TeZAByziUj5aWzUXIS7B4X2Xnkfng5O4ef5DGIObGCPJzxRW');
+$session = new FacebookSession('CAAAACzWJ7UIBAOlkVg5ZCpzlGYgTHJ5wpZC3KukghQAgphH3rlNzmRjdn0wYznbJ15NPIIHQ1pxDp2WRdCh4DoDj9btdVPfwzYfSmwZCUbu8IUZAal5k0tYBdU8wTafTDCYjPMAiKpa35BhPkXZC1gcs9yTyNmZBfabryYFUsKMEJjKYf3wgt7uXS65tPaw9hVGNLkVEF34FoZChXa3muw3');
 
 // To validate the session:
 try {
@@ -74,15 +77,38 @@ print "somethign else didn't work";
 */
 #'87e2e9e00a3d649972e2613969252789';
 
-
 print "Please go to " + $loginUrl + "\n";
-
 print "Geting Facebook Session" + "\n";
-//$session = new FacebookSession('access token here');
 
-// $fp = fopen("php://stdin","r");
-//    fgets($fp);
+print "Getting Facebook Accounts for desired Page\n";
 
+if($session) {
+try{
+	$request = new FacebookRequest(	  $session, 'GET', '/me/accounts');
+	$response = $request->execute();
+	$graphObject = $response->getGraphObject()->asArray();
+
+
+  } catch(FacebookRequestException $e) {
+
+    echo "Exception occured, code: " . $e->getCode() . "\n";
+    echo " with message: " . $e->getMessage() . "\n";
+
+  }   
+
+foreach($graphObject["data"] as $page) {
+    echo $page->id;
+    if($page->id == $FBPAGE_ID) {
+	print "Found Token\n";
+        $page_access_token = $page->access_token;
+        break;
+    }
+}
+}
+
+
+
+$session = new FacebookSession($page_access_token);
 
 if($session) {
 print "Have a Session\n";
@@ -92,13 +118,24 @@ print "Have a Session\n";
     // Upload to a user's profile. The photo will be in the
     // first album in the profile. You can also upload to
     // a specific album by using /ALBUM_ID as the path     
-    $response = (new FacebookRequest(
+ echo 'trying:';
+print '/'+$FBPAGE_ID+'/photos'; 
+
+
+   $response = (new FacebookRequest(
       $session, 'POST', '/me/photos', array(
         'source' => new CURLFile('504708006080.jpg', 'image/jpg'),
         'message' => 'User provided message'
       )
     ))->execute()->getGraphObject();
 
+   /*$response = (new FacebookRequest(
+      $session, 'POST', '/'+$FBPAGE_ID+'/photos', array(
+        'source' => new CURLFile('504708006080.jpg', 'image/jpg'),
+        'message' => 'User provided message'
+      )
+    ))->execute()->getGraphObject();
+*/
     // If you're not using PHP 5.5 or later, change the file reference to:
     // 'source' => '@/path/to/file.name'
 
