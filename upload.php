@@ -98,7 +98,7 @@ print '/'+$FBPAGE_ID+'/photos';
       )
     ))->execute()->getGraphObject();
 
-    echo "Posted with id: " . $response->getProperty('id');
+    echo "Posted with id: " . $response->getProperty('id') . "\n";
 
   } catch(FacebookRequestException $e) {
 
