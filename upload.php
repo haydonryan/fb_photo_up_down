@@ -54,59 +54,29 @@ try {
   echo $ex->getMessage()."\n";
 }
 
-
-
-
-
-#https://www.facebook.com/dialog/oauth?client_id=139730900025&redirect_uri=https%3A%2F%2Ffaceauth.appspot.com%2F%3Fversion%3D2100&scope=user_photos%2Cfriends_photos%2Cuser_likes%2Cuser_subscriptions&type=user_agent
-
-#$helper = new FacebookRedirectLoginHelper('http://amnesiaphotos.com/facebook');
-#$loginUrl = $helper->getLoginUrl();
-/*
-$helper = new FacebookCanvasLoginHelper();
-try {
-  $session = $helper->getSession();
-} catch (FacebookRequestException $ex) {
-print "FB didn't work"; 
-   // When Facebook returns an error
-} catch (\Exception $ex) {
-    // When validation fails or other local issues  
-print "somethign else didn't work"; 
-}
-
-*/
-#'87e2e9e00a3d649972e2613969252789';
-
-print "Please go to " + $loginUrl + "\n";
 print "Geting Facebook Session" + "\n";
 
 print "Getting Facebook Accounts for desired Page\n";
 
 if($session) {
-try{
-	$request = new FacebookRequest(	  $session, 'GET', '/me/accounts');
-	$response = $request->execute();
-	$graphObject = $response->getGraphObject()->asArray();
+	try{
+		$request = new FacebookRequest(	  $session, 'GET', '/me/accounts');
+		$response = $request->execute();
+		$graphObject = $response->getGraphObject()->asArray();
+	  } catch(FacebookRequestException $e) {
+	    echo "Exception occured, code: " . $e->getCode() . "\n";
+    	    echo " with message: " . $e->getMessage() . "\n";
+	  }   
 
-
-  } catch(FacebookRequestException $e) {
-
-    echo "Exception occured, code: " . $e->getCode() . "\n";
-    echo " with message: " . $e->getMessage() . "\n";
-
-  }   
-
-foreach($graphObject["data"] as $page) {
-    echo $page->id;
-    if($page->id == $FBPAGE_ID) {
-	print "Found Token\n";
-        $page_access_token = $page->access_token;
-        break;
-    }
+	foreach($graphObject["data"] as $page) {
+	echo $page->id;
+	if($page->id == $FBPAGE_ID) {
+		print "Found Token\n";
+		$page_access_token = $page->access_token;
+		break;
+	}
+	}
 }
-}
-
-
 
 $session = new FacebookSession($page_access_token);
 
@@ -122,22 +92,11 @@ print "Have a Session\n";
 print '/'+$FBPAGE_ID+'/photos'; 
 
 
-   $response = (new FacebookRequest(
-      $session, 'POST', '/me/photos', array(
+   $response = (new FacebookRequest(      $session, 'POST', '/me/photos', array(
         'source' => new CURLFile('504708006080.jpg', 'image/jpg'),
         'message' => 'User provided message'
       )
     ))->execute()->getGraphObject();
-
-   /*$response = (new FacebookRequest(
-      $session, 'POST', '/'+$FBPAGE_ID+'/photos', array(
-        'source' => new CURLFile('504708006080.jpg', 'image/jpg'),
-        'message' => 'User provided message'
-      )
-    ))->execute()->getGraphObject();
-*/
-    // If you're not using PHP 5.5 or later, change the file reference to:
-    // 'source' => '@/path/to/file.name'
 
     echo "Posted with id: " . $response->getProperty('id');
 
