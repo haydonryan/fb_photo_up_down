@@ -80,32 +80,82 @@ if($session) {
 
 $session = new FacebookSession($page_access_token);
 
-if($session) {
-print "Have a Session\n";
+CreateAlbum ( $session, 'Test Album', 'test' );
 
-  try {
+/*
+function LoginToFacebook ($title, $description )
+{
+echo "Creating Album, $title\n";
 
-    // Upload to a user's profile. The photo will be in the
-    // first album in the profile. You can also upload to
-    // a specific album by using /ALBUM_ID as the path     
- echo 'trying:';
-print '/'+$FBPAGE_ID+'/photos'; 
-
-
-   $response = (new FacebookRequest(      $session, 'POST', '/me/photos', array(
-        'source' => new CURLFile('504708006080.jpg', 'image/jpg'),
-        'message' => 'User provided message'
-      )
-    ))->execute()->getGraphObject();
-
-    echo "Posted with id: " . $response->getProperty('id') . "\n";
-
-  } catch(FacebookRequestException $e) {
-
-    echo "Exception occured, code: " . $e->getCode() . "\n";
-    echo " with message: " . $e->getMessage() . "\n";
-
-  }   
-
+return 1;
 }
+*/
+function UploadPhoto ( $session, $albumid,  $title, $description )
+{
+	echo "Creating Album, $title\n";
+
+	if($session) {
+		print "Have a Session\n";
+
+		  try {
+
+		    // Upload to a user's profile. The photo will be in the
+		    // first album in the profile. You can also upload to
+		    // a specific album by using /ALBUM_ID as the path     
+		 	echo 'trying:';
+			print '/'+$FBPAGE_ID+'/photos'; 
+
+		   $response = (new FacebookRequest(      $session, 'POST', '/me/photos', array(
+			'source' => new CURLFile('504708006080.jpg', 'image/jpg'),
+			'message' => 'User provided message'
+		      )
+		    ))->execute()->getGraphObject();
+
+		    echo "Posted with id: " . $response->getProperty('id') . "\n";
+
+		  } catch(FacebookRequestException $e) {
+
+		    echo "Exception occured, code: " . $e->getCode() . "\n";
+		    echo " with message: " . $e->getMessage() . "\n";
+
+		  }   
+
+	}
+	return 1;
+}
+
+function CreateAlbum ( $session, $albumName, $description )
+{
+
+	echo "Creating Album, $title\n";
+
+	if($session) {
+		  try {
+		    // Upload to a user's profile. The photo will be in the
+		    // first album in the profile. You can also upload to
+		    // a specific album by using /ALBUM_ID as the path     
+		 	echo 'trying:';
+			print '/'+$FBPAGE_ID+'/p'; 
+
+		   $response = (new FacebookRequest(      $session, 'POST', '/me/albums', array(
+			'name' => $albumName,
+			'message' => $description
+		//	'privacy' => $albumName,
+		      )
+		    ))->execute()->getGraphObject();
+
+		    echo "Posted with id: " . $response->getProperty('id') . "\n";
+			return $response->getProperty('id');
+		  } catch(FacebookRequestException $e) {
+
+		    echo "Exception occured, code: " . $e->getCode() . "\n";
+		    echo " with message: " . $e->getMessage() . "\n";
+
+		  }   
+
+	}
+	return 0;
+}
+
+
 ?>
