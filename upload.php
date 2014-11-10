@@ -42,11 +42,46 @@ print("https://www.facebook.com/dialog/oauth?client_id=$APP_ID&redirect_uri=http
 $session = new FacebookSession('CAAAACzWJ7UIBAOlkVg5ZCpzlGYgTHJ5wpZC3KukghQAgphH3rlNzmRjdn0wYznbJ15NPIIHQ1pxDp2WRdCh4DoDj9btdVPfwzYfSmwZCUbu8IUZAal5k0tYBdU8wTafTDCYjPMAiKpa35BhPkXZC1gcs9yTyNmZBfabryYFUsKMEJjKYf3wgt7uXS65tPaw9hVGNLkVEF34FoZChXa3muw3');
 
 
-$session =  LoginToFacebookPage ($session, $FBPAGE_ID );
+	$session =  LoginToFacebookPage ($session, $FBPAGE_ID );
 
-$album = CreateAlbum ( $session, 'Test Album', 'test' );
 //SetDate($session, $FBPAGE_ID, $page_access_token, $album,'2013-03-06T15:18:26-08:00');
-UploadPhoto($session, $album, '504708006080.jpg');
+
+	// Get All Subdirectory Names
+	$dirs = array_filter(glob('albums/*'), 'is_dir');
+	print_r( $dirs);
+	foreach($dirs as $directory) {
+		print "Uploading Directory $directory \n";
+		// Create Gallery Name based on Directory
+		$name = substr($directory, 7);
+		if ($name[0] == '_') continue;
+		print "Creating Album $name\n";
+		$album = CreateAlbum ( $session, $name, '(C) Amnesia Photos. Please contact us if you would like to purchase full resolution copies' );
+		if( preg_match('/[0-9]{8}/', $directory, $match)) 	{
+			//print_r($match);
+			$date = substr( $match[0],0,4) . "-" . substr($match[0],4,2) . "-" . substr($match[0],-2) . "-10:00";
+			print "Using Date: $date\n";
+			
+			foreach(glob($directory.'/*.jpg') as $file) {
+				print "Uploading ".$file . "\n";
+				UploadPhoto($session, $album, $file,$date);
+			}
+		} else {
+		//No Date found Using Today
+
+			foreach(glob($directory.'/*.jpg') as $file) {
+				print "Uploading ".$file . "\n";
+				//UploadPhoto($session, $album, $file);
+			}
+	
+		}
+	}
+
+// Get Date from Directory name
+
+   //Get All file names
+   //Upload File
+
+// }
 
 function LoginToFacebookPage ($session, $FBPAGE_ID )
 {
@@ -92,27 +127,17 @@ $session = new FacebookSession($page_access_token);
 return $session;
 }
 
-function UploadPhoto ( $session, $albumid, $filename )
+function UploadPhoto ( $session, $albumid, $filename, $time )
 {
-	echo "Creating Album, $title\n";
-
 	if($session) {
-		print "Have a Session\n";
 
 		  try {
-
-		    // Upload to a user's profile. The photo will be in the
-		    // first album in the profile. You can also upload to
-		    // a specific album by using /ALBUM_ID as the path     
-		 	echo 'trying:';
-			print '/'+$FBPAGE_ID+'/photos'; 
-
 		   $response = (new FacebookRequest(      $session, 'POST', "/$albumid/photos", array(
 			'source' => new CURLFile($filename, 'image/jpg'),
-			'message' => 'User provided message',
-			'backdated_time' => '2013-03-06T15:18:26',
-			'created_time' => '2013-03-06T15:18:26',
-			'updated_time' => '2013-03-06T15:18:26'
+			'message' => '',
+			'backdated_time' => $time, 
+			'created_time' => $time,
+			'updated_time' => $time
 		      )
 		    ))->execute()->getGraphObject();
 
@@ -133,7 +158,6 @@ function UploadPhoto ( $session, $albumid, $filename )
 function SetDate ( $session, $FBPAGE_ID, $page_access_token, $id, $date )
 {
 
-	echo "Creating Album, $title\n";
 
 	if($session) {
 		  try {
@@ -166,15 +190,8 @@ function SetDate ( $session, $FBPAGE_ID, $page_access_token, $id, $date )
 function CreateAlbum ( $session, $albumName, $description )
 {
 
-	echo "Creating Album, $title\n";
-
 	if($session) {
 		  try {
-		    // Upload to a user's profile. The photo will be in the
-		    // first album in the profile. You can also upload to
-		    // a specific album by using /ALBUM_ID as the path     
-		 	echo 'trying:';
-			print '/'+$FBPAGE_ID+'/p'; 
 
 		   $response = (new FacebookRequest(      $session, 'POST', "/$FBPAGE_ID/albums", array(
 			'name' => $albumName,
