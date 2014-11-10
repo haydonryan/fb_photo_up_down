@@ -140,6 +140,7 @@ function CreateAlbum ( $session, $albumName, $description )
 		   $response = (new FacebookRequest(      $session, 'POST', '/me/albums', array(
 			'name' => $albumName,
 			'message' => $description
+			'backdated_time' => '2013-03-06T15:18:26-08:00';
 		//	'privacy' => $albumName,
 		      )
 		    ))->execute()->getGraphObject();
