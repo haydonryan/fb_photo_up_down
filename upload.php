@@ -21,8 +21,8 @@ use Facebook\Entities\AccessToken;
 use Facebook\HttpClients\FacebookCurlHttpClient;
 use Facebook\HttpClients\FacebookHttpable;
 
-//$FBPAGE_ID = '191589877477';  //Amnesia Photos page
-$FBPAGE_ID = '629795797083447';  //retarded commedy page
+$FBPAGE_ID = '191589877477';  //Amnesia Photos page
+//$FBPAGE_ID = '629795797083447';  //retarded commedy page
 
 print "Starting up\n";
 print "Initialising SDK...";
